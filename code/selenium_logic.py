@@ -21,7 +21,7 @@ UNIVERSITIES = [
     "대구경북과학기술원", "광주과학기술원", "울산과학기술원"
 ]
 
-def search_company(company, company_decoration, company_color, colors, footer_color):
+def search_company(company, company_decoration, company_color, colors, footer_color, company_logo_b64=None):
 
     results = {}
 
@@ -153,17 +153,20 @@ Object.defineProperty(navigator, 'webdriver', {
         [school, str(count)] for school, count in sorted_results[:10]
     ]
 
-    # Google Apps Script로 보낼 데이터에 이미지 정보 추가
+    # Google Apps Script로 보낼 데이터에 로고 이미지(Base64) 추가
     data = {
         "company": company,
         "companyDecoration": company_decoration,
         "results": top_10_results,
-        "companyColor" : company_color,
+        "companyColor": company_color,
         "colors": colors,
-        "footerColor": footer_color
+        "footerColor": footer_color,
+        "companyLogo": company_logo_b64  # ★ 추가된 항목
     }
 
     response = requests.post(
-        "https://script.google.com/macros/s/AKfycbxSvYwneHOQiAAEvd2kshoV5BvopGQ2CMar5GGq7F23UJzb_Ml6GlIXBbkeBauexJD_-g/exec",
+        "https://script.google.com/macros/s/AKfycbzkuT80AMtSAzXmRQ1SNrODtd7mzvz92GIi2JknYq-ouvvgel2QJRz40xFYerCnlAAUMQ/exec",
         json=data
     )
+
+    return results

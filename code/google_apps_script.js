@@ -4,13 +4,13 @@ function doPost(e) {
 
     const company = data.company;
     const companyDecoration = data.companyDecoration;
+    const companyLogo = data.companyLogo;
     const results = data.results;
     const companyColor = data.companyColor || "#000000";
     const headerColors = data.colors || ['#000000', '#000000', '#000000', '#000000'];
     const footerColor = data.footerColor || '#000000';
     const defaultColor = '#000000';
 
-    // [설정] 대학교별 고정 텍스트 색상 매핑
     const schoolColorMap = {
         "서울대학교": "#1a3881",
         "연세대학교": "#003876",
@@ -51,7 +51,6 @@ function doPost(e) {
         "default": "#000000"
     };
 
-    // [설정] 긴 학교명을 약칭으로 치환해 주는 매핑 딕셔너리
     const schoolNameAliasMap = {
         "한국과학기술원": "KAIST",
         "포항공과대학교": "POSTECH",
@@ -83,7 +82,7 @@ function doPost(e) {
         "명지대학교": "https://drive.google.com/uc?export=view&id=1dSz_v_Fa176JkJf8MDxhfcJEKSICFgqF",
         "상명대학교": "https://drive.google.com/uc?export=view&id=16hqaRpfYd_4HPah_4GeIDWb07yreQkhK",
         "가천대학교": "https://drive.google.com/uc?export=view&id=1RCJtD4rJRtD1ZaxS19LJWpCDu71yKcaI",
-        "인하대학교": "https://drive.google.com/uc?export=view&id=19fEYy6XMyxjf9CIrL7Qeg8v6QSPJ1-95",
+        "인하대학교": "https://drive.google.com/uc?export=view&id=1hODa-r6VIeAWF8EikG0J7xeEDz0Jx92u",
         "아주대학교": "https://drive.google.com/uc?export=view&id=1QFDTzX5Pb5spX-s18L9X6ltneqge-Van",
         "서울과학기술대학교": "https://drive.google.com/uc?export=view&id=1oGAGuN9ZCCQVtqyrZ5zMJJiQrY0M9aAn",
         "부산대학교": "https://drive.google.com/uc?export=view&id=1flaXUrw_4sttT4wSnlhoj1Ko5LyXGQwp",
@@ -102,10 +101,35 @@ function doPost(e) {
     const doc = DocumentApp.create("2026년 " + companyDecoration + " 재직자 출신 대학 순위 TOP10");
     const body = doc.getBody();
 
-    // 1. 메인 타이틀 및 서브 타이틀 작성 (중앙 정렬)
-    const title = body.appendParagraph(companyDecoration);
-    title.setAlignment(DocumentApp.HorizontalAlignment.CENTER)
-        .setHeading(DocumentApp.ParagraphHeading.HEADING1);
+    if (companyLogo) {
+        try {
+            const decoded = Utilities.base64Decode(companyLogo);
+            const logoBlob = Utilities.newBlob(decoded, 'image/png', 'company_logo.png');
+
+            const logoParagraph = body.appendParagraph("");
+            const inlineImage = logoParagraph.appendInlineImage(logoBlob);
+
+            const origWidth = inlineImage.getWidth();
+            const origHeight = inlineImage.getHeight();
+
+            const targetHeight = 76;
+            const targetWidth = Math.round((origWidth / origHeight) * targetHeight);
+
+            inlineImage.setWidth(targetWidth);
+            inlineImage.setHeight(targetHeight);
+
+            logoParagraph.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+        } catch (err) {
+            Logger.log("로고 이미지 처리 실패: " + err);
+            const title = body.appendParagraph(company);
+            title.setAlignment(DocumentApp.HorizontalAlignment.CENTER)
+                .setHeading(DocumentApp.ParagraphHeading.HEADING1);
+        }
+    } else {
+        const title = body.appendParagraph(company);
+        title.setAlignment(DocumentApp.HorizontalAlignment.CENTER)
+            .setHeading(DocumentApp.ParagraphHeading.HEADING1);
+    }
 
     const subTitle = body.appendParagraph("");
     subTitle.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
@@ -130,9 +154,8 @@ function doPost(e) {
     gap.setSpacingBefore(0);
     gap.setSpacingAfter(0);
 
-    // 2. 표 데이터 구성 (총 4열 구조: 순위, 로고(빈칸), 학교명, 인원)
     const tableData = [];
-    tableData.push(["순위", "로고", "학교명", "인원"]); // 헤더
+    tableData.push(["순위", "", "학교명", "인원"]);
 
     results.forEach(function (item, index) {
         let rank = String(index + 1);
@@ -140,14 +163,11 @@ function doPost(e) {
         let displaySchoolName = schoolNameAliasMap[originalSchoolName] || originalSchoolName;
         let count = String(item[1]);
 
-        // 인덱스 1번(로고 칸)은 빈값으로 비워둡니다.
         tableData.push([rank, "", displaySchoolName, count + "명"]);
     });
 
-    // 3. 문서에 표 삽입
     const table = body.appendTable(tableData);
 
-    // 4. 표 스타일링 (헤더 행)
     const headerRow = table.getRow(0);
     for (let i = 0; i < headerRow.getNumCells(); i++) {
         let cell = headerRow.getCell(i);
@@ -163,8 +183,6 @@ function doPost(e) {
         text.setFontSize(12);
     }
 
-    // 4-2. 표 전체 데이터 셀 공통 스타일링 (중앙 정렬, 폰트 12, 볼드, 학교별 색상)
-    // 4-2. 표 전체 데이터 셀 스타일링
     for (let r = 1; r < table.getNumRows(); r++) {
         let row = table.getRow(r);
         let dataIndex = r - 1;
@@ -174,13 +192,12 @@ function doPost(e) {
             let cell = row.getCell(c);
             let p = cell.getChild(0).asParagraph();
 
-            // 열별 정렬
-            if (c === 1) { // 로고
+            if (c === 1) {
                 p.setAlignment(DocumentApp.HorizontalAlignment.RIGHT);
-            } else if (c === 2) { // 학교명
+            } else if (c === 2) {
                 p.setAlignment(DocumentApp.HorizontalAlignment.LEFT);
                 p.setSpacingBefore(10);
-            } else { // 순위, 인원
+            } else {
                 p.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
                 p.setSpacingBefore(10);
             }
@@ -189,7 +206,6 @@ function doPost(e) {
             cellText.setFontSize(12);
             cellText.setBold(true);
 
-            // 학교명 색상 적용
             if (c === 2) {
                 let targetColor =
                     schoolColorMap[originalSchoolName] || schoolColorMap["default"];
@@ -198,7 +214,6 @@ function doPost(e) {
         }
     }
 
-    // 4-3. 로고 칸(인덱스 1)과 학교명 칸(인덱스 2) 사이의 테두리를 흰색으로 설정하여 자연스럽게 연결
     for (let r = 1; r < table.getNumRows(); r++) {
         const row = table.getRow(r);
         const school = results[r - 1][0];
@@ -209,7 +224,6 @@ function doPost(e) {
         try {
             const blob = UrlFetchApp.fetch(logoUrl).getBlob();
 
-            // 기존 빈 문단 삭제
             const logoCell = row.getCell(1);
 
             while (logoCell.getNumChildren() > 0) {
@@ -217,13 +231,18 @@ function doPost(e) {
             }
 
             const p = logoCell.appendParagraph("");
-            p.appendInlineImage(blob)
-                .setWidth(38)
-                .setHeight(38);
+            const inlineImage = p.appendInlineImage(blob);
 
-            // 가운데 정렬
-            logoCell.getChild(0).asParagraph()
-                .setAlignment(DocumentApp.HorizontalAlignment.RIGHT);
+            const origWidth = inlineImage.getWidth();
+            const origHeight = inlineImage.getHeight();
+
+            const targetHeight = 38;
+            const targetWidth = Math.round((origWidth / origHeight) * targetHeight);
+
+            inlineImage.setWidth(targetWidth);
+            inlineImage.setHeight(targetHeight);
+
+            p.setAlignment(DocumentApp.HorizontalAlignment.RIGHT);
 
         } catch (err) {
             Logger.log(school);
@@ -231,7 +250,6 @@ function doPost(e) {
         }
     }
 
-    // 5. 하단 출처 문구 추가
     const footer = body.getChild(body.getChildIndex(table) + 1).asParagraph();
 
     footer.setText("출처: LinkedIn");
