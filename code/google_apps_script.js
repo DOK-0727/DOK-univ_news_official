@@ -83,7 +83,7 @@ function doPost(e) {
         "상명대학교": "https://drive.google.com/uc?export=view&id=16hqaRpfYd_4HPah_4GeIDWb07yreQkhK",
         "가천대학교": "https://drive.google.com/uc?export=view&id=1RCJtD4rJRtD1ZaxS19LJWpCDu71yKcaI",
         "인하대학교": "https://drive.google.com/uc?export=view&id=1hODa-r6VIeAWF8EikG0J7xeEDz0Jx92u",
-        "아주대학교": "https://drive.google.com/uc?export=view&id=1QFDTzX5Pb5spX-s18L9X6ltneqge-Van",
+        "아주대학교": "https://drive.google.com/uc?export=view&id=1y59q4_VOfjzmqzGeNoQy3JMV01vF1585",
         "서울과학기술대학교": "https://drive.google.com/uc?export=view&id=1oGAGuN9ZCCQVtqyrZ5zMJJiQrY0M9aAn",
         "부산대학교": "https://drive.google.com/uc?export=view&id=1flaXUrw_4sttT4wSnlhoj1Ko5LyXGQwp",
         "경북대학교": "https://drive.google.com/uc?export=view&id=1qRgKp8VaWNzr2eLo_V4eX7cJU7ok0gTT",
@@ -101,12 +101,13 @@ function doPost(e) {
     const doc = DocumentApp.create("2026년 " + companyDecoration + " 재직자 출신 대학 순위 TOP10");
     const body = doc.getBody();
 
+    const logoParagraph = body.getParagraphs()[0];
+
     if (companyLogo) {
         try {
             const decoded = Utilities.base64Decode(companyLogo);
             const logoBlob = Utilities.newBlob(decoded, 'image/png', 'company_logo.png');
 
-            const logoParagraph = body.appendParagraph("");
             const inlineImage = logoParagraph.appendInlineImage(logoBlob);
 
             const origWidth = inlineImage.getWidth();
@@ -121,13 +122,13 @@ function doPost(e) {
             logoParagraph.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
         } catch (err) {
             Logger.log("로고 이미지 처리 실패: " + err);
-            const title = body.appendParagraph(company);
-            title.setAlignment(DocumentApp.HorizontalAlignment.CENTER)
+            logoParagraph.setText(company);
+            logoParagraph.setAlignment(DocumentApp.HorizontalAlignment.CENTER)
                 .setHeading(DocumentApp.ParagraphHeading.HEADING1);
         }
     } else {
-        const title = body.appendParagraph(company);
-        title.setAlignment(DocumentApp.HorizontalAlignment.CENTER)
+        logoParagraph.setText(company);
+        logoParagraph.setAlignment(DocumentApp.HorizontalAlignment.CENTER)
             .setHeading(DocumentApp.ParagraphHeading.HEADING1);
     }
 

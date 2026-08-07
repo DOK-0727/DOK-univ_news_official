@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <title>LinkedIn University Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 
 <body>
@@ -14,18 +16,57 @@
         <br><br>
         <label>회사 로고 이미지: <input type="file" name="company_logo" accept="image/*"></label>
         <br><br>
-        <label>회사명 색상: <input type="color" name="company_color" value="#000000"></label>
+        <label>회사명: <input type="color" name="company_color" value="#000000"></label>
+        <label>순위: <input type="color" name="color1" value="#000000"></label>
+        <label>로고: <input type="color" name="color2" value="#000000"></label>
+        <label>학교명: <input type="color" name="color3" value="#000000"></label>
+        <label>인원: <input type="color" name="color4" value="#000000"></label>
+        <label>출처: <input type="color" name="footer_color" value="#000000"></label>
         <br><br>
-        <label>순위 배경색: <input type="color" name="color1" value="#000000"></label>
-        <label>로고 배경색: <input type="color" name="color2" value="#000000"></label>
-        <label>학교명 배경색: <input type="color" name="color3" value="#000000"></label>
-        <label>인원 배경색: <input type="color" name="color4" value="#000000"></label>
-        <br><br>
-        <label>출처 문구 색상: <input type="color" name="footer_color" value="#000000"></label>
-        <br><br>
-
         <button type="submit">검색</button>
+        <hr>
+        <h3>색상 추출기</h3>
+
+        <canvas id="logoCanvas" style="border:1px solid #ccc; max-width:500px;"></canvas>
+
+        <p>
+            선택한 색 :
+            <input type="text" id="pickedColor" value="#000000" readonly>
+            <input type="color" id="pickedColorPreview" value="#000000">
+        </p>
+
+        <p>
+            <button type="button" onclick="applyColor('company_color')">회사명</button>
+            <button type="button" onclick="applyColor('color1')">순위</button>
+            <button type="button" onclick="applyColor('color2')">로고</button>
+            <button type="button" onclick="applyColor('color3')">학교명</button>
+            <button type="button" onclick="applyColor('color4')">인원</button>
+            <button type="button" onclick="applyColor('footer_color')">출처</button>
+        </p>
     </form>
+
+    {% if results %}
+    <hr>
+    <h3>생성된 홍보 문구 (복사용)</h3>
+
+    <div style="margin-bottom: 15px;">
+        <label for="generated_title"><strong>제목</strong></label><br>
+        <textarea id="generated_title" rows="2" style="width: 100%; max-width: 600px;">{{ title }}</textarea><br>
+        <button type="button" onclick="copyText('generated_title')">제목 복사</button>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="generated_content"><strong>내용</strong></label><br>
+        <textarea id="generated_content" rows="6" style="width: 100%; max-width: 600px;">{{ content }}</textarea><br>
+        <button type="button" onclick="copyText('generated_content')">내용 복사</button>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="generated_tags"><strong>태그</strong></label><br>
+        <textarea id="generated_tags" rows="3" style="width: 100%; max-width: 600px;">{{ tags }}</textarea><br>
+        <button type="button" onclick="copyText('generated_tags')">태그 복사</button>
+    </div>
+    {% endif %}
 </body>
 
 </html>

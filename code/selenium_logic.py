@@ -153,7 +153,6 @@ Object.defineProperty(navigator, 'webdriver', {
         [school, str(count)] for school, count in sorted_results[:10]
     ]
 
-    # Google Apps Script로 보낼 데이터에 로고 이미지(Base64) 추가
     data = {
         "company": company,
         "companyDecoration": company_decoration,
@@ -161,12 +160,12 @@ Object.defineProperty(navigator, 'webdriver', {
         "companyColor": company_color,
         "colors": colors,
         "footerColor": footer_color,
-        "companyLogo": company_logo_b64  # ★ 추가된 항목
+        "companyLogo": company_logo_b64
     }
 
     response = requests.post(
-        "https://script.google.com/macros/s/AKfycbzkuT80AMtSAzXmRQ1SNrODtd7mzvz92GIi2JknYq-ouvvgel2QJRz40xFYerCnlAAUMQ/exec",
+        "https://script.google.com/macros/s/AKfycbzzJ-ZGhnlcOCFHuexeRUN8-bzgfRyp9_A1eZwZQsnPl9RCNLD577JkJgdw5JVAzGPLdQ/exec",
         json=data
     )
 
-    return results
+    return top_10_results
