@@ -1,37 +1,126 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 30px;
+    margin: 0;
+    background: #f7f7f5;
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    color: #191919;
+}
+
+.container {
+    width: 900px;
+    margin: 50px auto;
+}
+
+.page-header {
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    font-size: 38px;
+    margin-bottom: 8px;
+}
+
+.page-header p {
+    color: #6b7280;
+}
+
+.card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 24px;
+}
+
+.card h2 {
+    margin-top: 0;
+    margin-bottom: 24px;
+    font-size: 22px;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
 }
 
 label {
-    display: inline-block;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+input[type=text],
+input[type=file],
+textarea {
+
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 15px;
+    background: white;
+}
+
+input[type=text]:focus,
+textarea:focus {
+
+    outline: none;
+    border-color: #2383e2;
+    box-shadow: 0 0 0 3px rgba(35, 131, 226, .15);
+
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.primary-btn,
+button {
+
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    background: #191919;
+    color: white;
+    cursor: pointer;
+    transition: .2s;
+}
+
+button:hover {
+    opacity: .88;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 canvas {
-    border: 1px solid #ccc;
-    max-width: 600px;
-    cursor: crosshair;
-    display: block;
-    margin-top: 15px;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
 }
 
-.color-buttons button {
-    margin: 3px;
-}
-
-#pickedColor {
-    width: 100px;
-    text-align: center;
-    font-weight: bold;
-}
-
-.preview {
+.picked-color {
     display: flex;
-    align-items: center;
     gap: 10px;
-}
-
-hr {
-    margin: 30px 0;
+    margin: 20px 0;
 }

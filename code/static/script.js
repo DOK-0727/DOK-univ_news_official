@@ -86,22 +86,17 @@ function applyColor(name) {
     document.querySelector(`input[name="${name}"]`).value = color;
 }
 
-// 기존 코드 하단에 추가
-
 function copyText(elementId) {
     const textarea = document.getElementById(elementId);
     if (!textarea) return;
 
     textarea.select();
-    textarea.setSelectionRange(0, 99999); // 모바일 기기 대응
+    textarea.setSelectionRange(0, 99999);
 
     navigator.clipboard.writeText(textarea.value)
         .then(() => {
-            alert("클립보드에 복사되었습니다!");
         })
         .catch(err => {
-            // 구형 브라우저 대응 fallback
             document.execCommand('copy');
-            alert("클립보드에 복사되었습니다!");
         });
 }
