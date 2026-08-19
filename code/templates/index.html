@@ -6,104 +6,151 @@
     <title>DOK-univ_news_official</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+    <script>
+        function toggleMode() {
+            var mode = document.getElementById("mode").value;
+            if (mode === "linkedin") {
+                document.getElementById("linkedin_fields").style.display = "block";
+                document.getElementById("adiga_fields").style.display = "none";
+                document.getElementById("header_title").innerText = "회사 검색 (LinkedIn)";
+                document.getElementById("header_desc").innerText = "LinkedIn 대학 데이터를 이용하여 이미지를 생성합니다.";
+            } else {
+                document.getElementById("linkedin_fields").style.display = "none";
+                document.getElementById("adiga_fields").style.display = "block";
+                document.getElementById("header_title").innerText = "대학 경쟁률 검색 (Adiga)";
+                document.getElementById("header_desc").innerText = "Adiga 데이터를 이용하여 Google Docs를 생성합니다.";
+            }
+        }
+        window.onload = function () {
+            toggleMode();
+        };
+    </script>
 </head>
 
 <body>
     <div class="container">
 
         <header class="page-header">
-            <h1>회사 검색</h1>
-            <p>LinkedIn 대학 데이터를 이용하여 이미지를 생성합니다.</p>
+            <h1 id="header_title">회사 검색 (LinkedIn)</h1>
+            <p id="header_desc">LinkedIn 대학 데이터를 이용하여 이미지를 생성합니다.</p>
         </header>
 
         <form method="POST" enctype="multipart/form-data">
 
+            <!-- 작업 모드 선택 -->
+            <section class="card">
+                <h2>작업 모드 선택</h2>
+                <div class="field">
+                    <select id="mode" name="mode" onchange="toggleMode()">
+                        <option value="linkedin" {% if mode=='linkedin' %}selected{% endif %}>1. LinkedIn (재직자 출신 대학 검색)
+                        </option>
+                        <option value="adiga" {% if mode=='adiga' %}selected{% endif %}>2. Adiga (대학 학과별 경쟁률 검색)
+                        </option>
+                    </select>
+                </div>
+            </section>
+
             <section class="card">
                 <h2>기본 정보</h2>
 
-                <div class="grid-2">
-                    <div class="field">
-                        <label>검색용 회사명</label>
-                        <input type="text" name="company" required>
+                <!-- LinkedIn용 입력 필드 -->
+                <div id="linkedin_fields">
+                    <div class="grid-2">
+                        <div class="field">
+                            <label>검색용 회사명</label>
+                            <input type="text" name="company" id="linkedin_company">
+                        </div>
+                        <div class="field">
+                            <label>표시용 회사명</label>
+                            <input type="text" name="company_decoration" id="linkedin_company_decoration">
+                        </div>
                     </div>
-
                     <div class="field">
-                        <label>표시용 회사명</label>
-                        <input type="text" name="company_decoration" required>
+                        <label>회사 로고</label>
+                        <input type="file" name="company_logo" accept="image/*">
                     </div>
                 </div>
 
-                <div class="field">
-                    <label>회사 로고</label>
-                    <input type="file" name="company_logo" accept="image/*">
+                <!-- Adiga용 입력 필드 -->
+                <div id="adiga_fields" style="display:none;">
+                    <div class="grid-2">
+                        <div class="field">
+                            <label>검색용 대학명</label>
+                            <input type="text" name="university" id="adiga_university">
+                        </div>
+                        <div class="field">
+                            <label>기준 연도</label>
+                            <input type="text" name="year" id="adiga_year">
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="field">
+                            <label>전형 종류</label>
+                            <select name="admission_type">
+                                <option value="수시">수시</option>
+                                <option value="정시">정시</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>대학 로고 (문서 상단 및 표 내부)</label>
+                            <input type="file" name="univ_logo" accept="image/*">
+                        </div>
+                    </div>
                 </div>
+
             </section>
 
             <section class="card">
                 <h2>색상 설정</h2>
 
                 <div class="color-grid">
-
                     <div class="field">
-                        <label>회사명</label>
-                        <input type="color" name="company_color">
+                        <label>회사명 / 대학명</label>
+                        <input type="color" name="main_color">
                     </div>
-
                     <div class="field">
                         <label>순위</label>
                         <input type="color" name="color1">
                     </div>
-
                     <div class="field">
-                        <label>로고</label>
+                        <label>로고 여백</label>
                         <input type="color" name="color2">
                     </div>
-
                     <div class="field">
-                        <label>학교명</label>
+                        <label>학교명 / 학과명</label>
                         <input type="color" name="color3">
                     </div>
-
                     <div class="field">
-                        <label>인원</label>
+                        <label>인원 / 경쟁률</label>
                         <input type="color" name="color4">
                     </div>
-
                     <div class="field">
                         <label>출처</label>
                         <input type="color" name="footer_color">
                     </div>
-
                 </div>
 
                 <button class="primary-btn" type="submit">
-                    검색하기
+                    검색 및 문서 생성하기
                 </button>
 
             </section>
 
             <section class="card">
                 <h2>색상 추출기</h2>
-
                 <canvas id="logoCanvas"></canvas>
-
                 <div class="picked-color">
-
                     <input type="text" id="pickedColor" readonly>
-
                     <input type="color" id="pickedColorPreview">
-
                 </div>
-
                 <div class="button-group">
-                    <button type="button" onclick="applyColor('company_color')">회사명</button>
+                    <button type="button" onclick="applyColor('main_color')">회사명/대학명</button>
                     <button type="button" onclick="applyColor('color1')">순위</button>
-                    <button type="button" onclick="applyColor('color2')">로고</button>
-                    <button type="button" onclick="applyColor('color3')">학교명</button>
-                    <button type="button" onclick="applyColor('color4')">인원</button>
+                    <button type="button" onclick="applyColor('color2')">로고 여백</button>
+                    <button type="button" onclick="applyColor('color3')">학교명/학과명</button>
+                    <button type="button" onclick="applyColor('color4')">인원/경쟁률</button>
                     <button type="button" onclick="applyColor('footer_color')">출처</button>
                 </div>
-
             </section>
 
         </form>
@@ -111,33 +158,22 @@
         {% if results %}
 
         <section class="card">
-
             <h2>생성된 문구</h2>
-
             <div class="field">
                 <label>제목</label>
                 <textarea id="generated_title">{{ title }}</textarea>
-                <button onclick="copyText('generated_title')">
-                    복사
-                </button>
+                <button onclick="copyText('generated_title')">복사</button>
             </div>
-
             <div class="field">
                 <label>내용</label>
                 <textarea id="generated_content">{{ content }}</textarea>
-                <button onclick="copyText('generated_content')">
-                    복사
-                </button>
+                <button onclick="copyText('generated_content')">복사</button>
             </div>
-
             <div class="field">
                 <label>태그</label>
                 <textarea id="generated_tags">{{ tags }}</textarea>
-                <button onclick="copyText('generated_tags')">
-                    복사
-                </button>
+                <button onclick="copyText('generated_tags')">복사</button>
             </div>
-
         </section>
 
         {% endif %}
