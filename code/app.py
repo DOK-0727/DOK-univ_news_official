@@ -4,7 +4,6 @@ from linkedin_download import search_company
 
 app = Flask(__name__)
 
-
 @app.route("/", methods=["GET", "POST"])
 def index():
     results = None

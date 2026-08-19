@@ -9,6 +9,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+
 profile_path = Path(
     "/Users/handokyung/Desktop/DOK/DOK-univ_news_official/adiga_profile"
 )
@@ -17,6 +18,7 @@ Path(profile_path).mkdir(
     parents=True,
     exist_ok=True
 )
+
 
 options = Options()
 
@@ -42,6 +44,7 @@ options.add_experimental_option(
     False
 )
 
+
 driver = webdriver.Chrome(
     options=options
 )
@@ -59,10 +62,12 @@ driver.execute_cdp_cmd(
     }
 )
 
+
 wait = WebDriverWait(
     driver,
     20
 )
+
 
 university = "서울대학교"
 
@@ -70,9 +75,11 @@ results = {
     university: []
 }
 
+
 driver.get(
     "https://www.adiga.kr"
 )
+
 
 search_input = wait.until(
     EC.presence_of_element_located(
@@ -93,6 +100,7 @@ search_input.send_keys(
     Keys.ENTER
 )
 
+
 major_info = wait.until(
     EC.element_to_be_clickable(
         (
@@ -103,6 +111,7 @@ major_info = wait.until(
 )
 
 major_info.click()
+
 
 wait.until(
     EC.presence_of_element_located(
@@ -117,20 +126,7 @@ time.sleep(2)
 
 
 def get_last_page():
-    """
-    페이지네이션에서 마지막 페이지를 가져온다.
-
-    예:
-
-    <li class="ctrlBtn nxtEnd page-item">
-        <a onclick="majorInfo('27')"></a>
-    </li>
-
-    -> 27
-    """
-
     try:
-
         end_button = driver.find_element(
             By.CSS_SELECTOR,
             "ul.majorPagination li.nxtEnd a"
@@ -141,7 +137,6 @@ def get_last_page():
         )
 
         if onclick:
-
             match = re.search(
                 r"majorInfo\(['\"](\d+)['\"]\)",
                 onclick
@@ -156,7 +151,6 @@ def get_last_page():
         pass
 
     try:
-
         page_links = driver.find_elements(
             By.CSS_SELECTOR,
             "ul.majorPagination li.numb.page-item a"
@@ -165,7 +159,6 @@ def get_last_page():
         page_numbers = []
 
         for link in page_links:
-
             text = link.text.strip()
 
             if text.isdigit():
@@ -186,14 +179,12 @@ def get_last_page():
 
 def get_first_row_text():
     try:
-
         return driver.find_element(
             By.CSS_SELECTOR,
             "table.ucpTable tbody tr:first-child"
         ).text.strip()
 
     except Exception:
-
         return ""
 
 
@@ -205,12 +196,9 @@ def collect_current_page(page_number):
 
     row_count = len(rows)
 
-    for index in range(
-            row_count
-    ):
+    for index in range(row_count):
 
         try:
-
             row = driver.find_element(
                 By.CSS_SELECTOR,
                 f"table.ucpTable tbody tr:nth-child({index + 1})"
@@ -261,12 +249,9 @@ def collect_current_page(page_number):
                 ).text.strip()
 
                 if category == "수시":
-
                     early_rate = value
 
-
                 elif category == "정시":
-
                     regular_rate = value
 
             results[university].append(
@@ -277,20 +262,14 @@ def collect_current_page(page_number):
                 }
             )
 
-            print(
-                f"{department} | "
-                f"수시: {early_rate} | "
-                f"정시: {regular_rate}"
-            )
-
-
-        except Exception as e:
+        except Exception:
             continue
 
 
 last_page = get_last_page()
 
 current_page = 1
+
 
 while current_page <= last_page:
 
@@ -322,7 +301,6 @@ while current_page <= last_page:
         if old_first_row:
 
             try:
-
                 wait.until(
                     lambda d:
                     get_first_row_text()
@@ -330,11 +308,9 @@ while current_page <= last_page:
                 )
 
             except Exception:
-
                 time.sleep(1)
 
         else:
-
             time.sleep(1)
 
         wait.until(
@@ -349,21 +325,6 @@ while current_page <= last_page:
         time.sleep(0.5)
 
         current_page += 1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     except Exception:
 
@@ -407,7 +368,6 @@ while current_page <= last_page:
                 )
 
             except Exception:
-
                 time.sleep(1)
 
             target_page_link = wait.until(
@@ -437,11 +397,9 @@ while current_page <= last_page:
                     )
 
                 except Exception:
-
                     time.sleep(1)
 
             else:
-
                 time.sleep(1)
 
             wait.until(
@@ -457,10 +415,11 @@ while current_page <= last_page:
 
             current_page += 1
 
-
-        except Exception as e:
-
+        except Exception:
             break
+
+
+# 중복 제거
 
 unique_results = []
 
@@ -485,15 +444,97 @@ for item in results[university]:
         item
     )
 
+
 results[university] = unique_results
 
+def convert_rate(value):
+
+    try:
+
+        value = str(value).strip()
+
+        match = re.search(
+            r"[\d.]+",
+            value
+        )
+
+        if match:
+            return float(
+                match.group()
+            )
+
+    except Exception:
+        pass
+
+    return 0
+
+sorted_results = {
+    "수시": [],
+    "정시": []
+}
+
+
+for item in results[university]:
+
+    sorted_results["수시"].append(
+        {
+            "department": item["department"],
+            "value": item["수시"]
+        }
+    )
+
+    sorted_results["정시"].append(
+        {
+            "department": item["department"],
+            "value": item["정시"]
+        }
+    )
+
+sorted_results["수시"].sort(
+    key=lambda x: convert_rate(
+        x["value"]
+    ),
+    reverse=True
+)
+
+sorted_results["정시"].sort(
+    key=lambda x: convert_rate(
+        x["value"]
+    ),
+    reverse=True
+)
+
+results[university] = sorted_results
+
+print()
+print("=" * 60)
+print(f"{university} 수시 경쟁률")
+print("=" * 60)
+
 for index, item in enumerate(
-        results[university],
-        start=1
+    results[university]["수시"],
+    start=1
 ):
+
     print(
         f"{index}. "
         f"{item['department']} | "
-        f"수시: {item['수시']} | "
-        f"정시: {item['정시']}"
+        f"수시: {item['value']}"
+    )
+
+
+print()
+print("=" * 60)
+print(f"{university} 정시 경쟁률")
+print("=" * 60)
+
+for index, item in enumerate(
+    results[university]["정시"],
+    start=1
+):
+
+    print(
+        f"{index}. "
+        f"{item['department']} | "
+        f"정시: {item['value']}"
     )
