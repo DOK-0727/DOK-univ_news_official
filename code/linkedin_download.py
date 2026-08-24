@@ -22,7 +22,7 @@ UNIVERSITIES = [
 ]
 
 
-def search_company(company, company_decoration, company_color, colors, footer_color, company_logo_b64=None):
+def search_company(company, company_decoration, linkedin_year, company_color, colors, footer_color, company_logo_b64=None):
     results = {}
 
     profile_path = Path("/Users/handokyung/Desktop/DOK/DOK-univ_news_official/linkedin_profile")
@@ -133,6 +133,7 @@ Object.defineProperty(navigator, 'webdriver', {
     data = {
         "company": company,
         "companyDecoration": company_decoration,
+        "linkedin_year": linkedin_year,
         "results": top_10_results,
         "companyColor": company_color,
         "colors": colors,
@@ -141,7 +142,7 @@ Object.defineProperty(navigator, 'webdriver', {
     }
 
     response = requests.post(
-        "https://script.google.com/macros/s/AKfycbzzJ-ZGhnlcOCFHuexeRUN8-bzgfRyp9_A1eZwZQsnPl9RCNLD577JkJgdw5JVAzGPLdQ/exec",
+        "https://script.google.com/macros/s/AKfycbz3sLKPHNK6cfh4siCRRpzeIKyTnyt8hbOZyoULPPi9NKbgENf727h5kaUD3lh0OEXi1A/exec",
         json=data
     )
 

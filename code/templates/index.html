@@ -32,7 +32,7 @@
 
         <header class="page-header">
             <h1 id="header_title">회사 검색 (LinkedIn)</h1>
-            <p id="header_desc">LinkedIn 대학 데이터를 이용하여 이미지를 생성합니다.</p>
+            <p id="header_desc">LinkedIn 데이터를 이용하여 Google Docs를 생성합니다.</p>
         </header>
 
         <form method="POST" enctype="multipart/form-data">
@@ -53,7 +53,7 @@
             <section class="card">
                 <h2>기본 정보</h2>
 
-                <!-- LinkedIn용 입력 필드 -->
+                <!-- LinkedIn용 입력 필드 -->            
                 <div id="linkedin_fields">
                     <div class="grid-2">
                         <div class="field">
@@ -65,12 +65,18 @@
                             <input type="text" name="company_decoration" id="linkedin_company_decoration">
                         </div>
                     </div>
-                    <div class="field">
-                        <label>회사 로고</label>
-                        <input type="file" name="company_logo" accept="image/*">
+
+                    <div class="grid-2">
+                        <div class="field">
+                            <label>기준 연도</label>
+                            <input type="text" name="linkedin_year" id="linkedin_year">
+                        </div>
+                        <div class="field">
+                            <label>회사 로고</label>
+                            <input type="file" name="company_logo" accept="image/*">
+                        </div>
                     </div>
                 </div>
-
                 <!-- Adiga용 입력 필드 -->
                 <div id="adiga_fields" style="display:none;">
                     <div class="grid-2">
@@ -80,7 +86,7 @@
                         </div>
                         <div class="field">
                             <label>기준 연도</label>
-                            <input type="text" name="year" id="adiga_year">
+                            <input type="text" name="adiga_year" id="adiga_year">
                         </div>
                     </div>
                     <div class="grid-2">

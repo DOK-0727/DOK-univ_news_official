@@ -4,6 +4,7 @@ function doPost(e) {
 
     const company = data.company;
     const companyDecoration = data.companyDecoration;
+    const year = data.linkedin_year;
     const companyLogo = data.companyLogo;
     const results = data.results;
     const companyColor = data.companyColor || "#000000";
@@ -54,7 +55,7 @@ function doPost(e) {
     const schoolNameAliasMap = {
         "한국과학기술원": "KAIST",
         "포항공과대학교": "POSTECH",
-        "대구경북과학기술원": "DIGIST",
+        "대구경북과학기술원": "DGIST",
         "광주과학기술원": "GIST",
         "울산과학기술원": "UNIST"
     };
@@ -98,7 +99,7 @@ function doPost(e) {
         "울산과학기술원": "https://drive.google.com/uc?export=view&id=1CqjejLpe16gCpQ8Ruv11FCB0oQdAeHl9"
     };
 
-    const doc = DocumentApp.create("2026년 " + companyDecoration + " 재직자 출신 대학 순위 TOP10");
+    const doc = DocumentApp.create(year + "년 " + companyDecoration + " 재직자 출신 대학 순위 TOP10");
     const body = doc.getBody();
 
     const logoParagraph = body.getParagraphs()[0];
@@ -135,7 +136,7 @@ function doPost(e) {
     const subTitle = body.appendParagraph("");
     subTitle.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
 
-    subTitle.appendText("2026년 ")
+    subTitle.appendText(year + "년 ")
         .setBold(true)
         .setFontSize(35)
         .setForegroundColor(defaultColor);

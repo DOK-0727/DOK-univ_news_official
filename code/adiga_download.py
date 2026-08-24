@@ -47,7 +47,7 @@ def convert_rate(value):
     return 0
 
 
-def search_university(university, year, admission_type, univ_color, colors, footer_color, univ_logo_b64=None):
+def search_university(university, adiga_year, admission_type, univ_color, colors, footer_color, univ_logo_b64=None):
     profile_path = Path("/Users/handokyung/Desktop/DOK/DOK-univ_news_official/adiga_profile")
     Path(profile_path).mkdir(parents=True, exist_ok=True)
 
@@ -158,7 +158,7 @@ def search_university(university, year, admission_type, univ_color, colors, foot
     # Google Apps Script로 전송
     data = {
         "university": university,
-        "year": year,
+        "adiga_year": adiga_year,
         "admissionType": admission_type,
         "results": top_10_results,
         "univColor": univ_color,
@@ -168,7 +168,7 @@ def search_university(university, year, admission_type, univ_color, colors, foot
     }
 
     # TODO: 본인의 Google Apps Script 배포 URL로 변경하세요.
-    WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx37TOEA8WcO0oll5v6Y5y9ScbX8Qy-LOpfFeChqVA2UlaBLrKSeaFe0ZYD2wzzysos/exec"
+    WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzRlSDf6Icnd8dO0xvnCbJ_Px639Tl8WvxtpFQ4Rf03ZdaDdkOBpsAK2PSwJAvfpcdK/exec"
     try:
         requests.post(WEBHOOK_URL, json=data)
     except:

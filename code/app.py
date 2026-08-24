@@ -79,6 +79,7 @@ def index():
         if mode == "linkedin":
             company = request.form.get("company", "")
             company_decoration = request.form.get("company_decoration", "")
+            linkedin_year = request.form.get("linkedin_year", "")
 
             company_logo_b64 = None
             if "company_logo" in request.files:
@@ -88,7 +89,7 @@ def index():
 
             if company and company_decoration:
                 results = search_company(
-                    company, company_decoration, main_color, colors, footer_color, company_logo_b64
+                    company, company_decoration, linkedin_year, main_color, colors, footer_color, company_logo_b64
                 )
 
                 if results:
@@ -178,8 +179,8 @@ def index():
         # ---------------------------------------------------------
         elif mode == "adiga":
             university = request.form.get("university", "")
-            year = request.form.get("year", "2025")
-            admission_type = request.form.get("admission_type", "수시")
+            adiga_year = request.form.get("adiga_year", "")
+            admission_type = request.form.get("admission_type", "")
 
             univ_logo_b64 = None
             if "univ_logo" in request.files:
@@ -187,9 +188,9 @@ def index():
                 if file and file.filename != "":
                     univ_logo_b64 = base64.b64encode(file.read()).decode("utf-8")
 
-            if university and year:
+            if university and adiga_year:
                 results = search_university(
-                    university, year, admission_type, main_color, colors, footer_color, univ_logo_b64
+                    university, adiga_year, admission_type, main_color, colors, footer_color, univ_logo_b64
                 )
 
                 if results:
@@ -199,13 +200,13 @@ def index():
 
                     top4_str = ", ".join(dept for dept, rate in results[:4])
 
-                    title = f"{year}년 {university} {admission_type} 경쟁률 순위 TOP10 한눈에 정리"
+                    title = f"{adiga_year}년 {university} {admission_type} 경쟁률 순위 TOP10 한눈에 정리"
                     content = (
                         f"안녕하세요.\n\n"
-                        f"오늘은 {year}년 {university} {admission_type} 경쟁률 순위 TOP10을 정리해보겠습니다.\n\n"
+                        f"오늘은 {adiga_year}년 {university} {admission_type} 경쟁률 순위 TOP10을 정리해보겠습니다.\n\n"
                         f"{university}에서 어떤 학과의 인기가 가장 높았을까요?\n\n"
                         f"이번 자료에서는 {university}의 입시 데이터를 바탕으로 경쟁률이 높은 학과를 순위별로 정리했습니다. {university} 입시를 준비하고 있는 수험생이나 고등학생, 해당 대학에 관심이 있는 분들이라면 참고해볼 만한 자료입니다.\n\n\n\n"
-                        f"{year}년 {university} {admission_type} 경쟁률 순위 TOP10을 살펴보겠습니다.\n\n"
+                        f"{adiga_year}년 {university} {admission_type} 경쟁률 순위 TOP10을 살펴보겠습니다.\n\n"
                         f"이번 조사에서 확인된 {university} {admission_type} 경쟁률 TOP10은 다음과 같습니다.\n\n"
                         f"{ranking_text}\n"
                         f"상위권에는 {top4_str} 등이 이름을 올렸으며 그 외에도 다양한 학과들이 확인되었습니다.\n\n"

@@ -2,7 +2,7 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents);
 
     const university = data.university;
-    const year = data.year;
+    const year = data.adiga_year;
     const admissionType = data.admissionType;
     const results = data.results;
     const univColor = data.univColor || "#000000";
@@ -43,7 +43,7 @@ function doPost(e) {
     gap.setFontSize(11).setSpacingBefore(0).setSpacingAfter(0);
 
     const tableData = [];
-    tableData.push(["순위", "", "학교명", "경쟁률"]);
+    tableData.push(["순위", "", "학괴명", "경쟁률"]);
 
     results.forEach(function (item, index) {
         tableData.push([String(index + 1), "", item[0], String(item[1])]);
