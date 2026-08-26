@@ -168,7 +168,7 @@ def search_university(university, adiga_year, admission_type, univ_color, colors
     }
 
     # TODO: 본인의 Google Apps Script 배포 URL로 변경하세요.
-    WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzRlSDf6Icnd8dO0xvnCbJ_Px639Tl8WvxtpFQ4Rf03ZdaDdkOBpsAK2PSwJAvfpcdK/exec"
+    WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwTLtGBjOFV0JVy-p6_wgAmfQQP5NHJKOMCOC-xtN4ofMuWQir6jgvlREqFmlCa_Sto/exec"
     try:
         requests.post(WEBHOOK_URL, json=data)
     except:
