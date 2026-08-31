@@ -1,7 +1,9 @@
+# app.py
 import base64
 from flask import Flask, render_template, request
 from linkedin_download import search_company
 from adiga_download import search_university
+from adiga_dept_download import search_department
 
 app = Flask(__name__)
 
@@ -64,7 +66,6 @@ def index():
     if request.method == "POST":
         mode = request.form.get("mode", "linkedin")
 
-        # 공통 색상 설정
         main_color = request.form.get("main_color", request.form.get("company_color", "#000000"))
         color1 = request.form.get("color1", "#000000")
         color2 = request.form.get("color2", "#000000")
@@ -73,9 +74,6 @@ def index():
         colors = [color1, color2, color3, color4]
         footer_color = request.form.get("footer_color", "#000000")
 
-        # ---------------------------------------------------------
-        # 1. LinkedIn 모드
-        # ---------------------------------------------------------
         if mode == "linkedin":
             company = request.form.get("company", "")
             company_decoration = request.form.get("company_decoration", "")
@@ -94,52 +92,22 @@ def index():
 
                 if results:
                     cleaned_results = []
-
                     for item in results:
-                        school = None
-                        count = None
-
-                        if isinstance(item, (list, tuple)):
-                            if len(item) >= 2:
-                                school = item[0]
-                                count = item[1]
-                        elif isinstance(item, dict):
-                            school = (
-                                    item.get("school")
-                                    or item.get("university")
-                                    or item.get("name")
-                            )
-                            count = (
-                                    item.get("count")
-                                    or item.get("people")
-                                    or item.get("number")
-                            )
-                        else:
-                            school = str(item)
-                            count = 0
-
-                        if not school:
-                            continue
-
+                        school = item[0] if isinstance(item, (list, tuple)) else str(item)
+                        count = item[1] if isinstance(item, (list, tuple)) else 0
                         school = UNIV_NAME_MAP.get(str(school), str(school))
-
                         try:
                             count = int(count)
                         except (ValueError, TypeError):
                             count = 0
-
                         cleaned_results.append((school, count))
 
                     cleaned_results.sort(key=lambda x: x[1], reverse=True)
                     top10_results = cleaned_results[:10]
+                    top4_str = ", ".join(school for school, _ in top10_results[:4])
 
-                    top4_str = ", ".join(
-                        school for school, count in top10_results[:4]
-                    )
-
-                    ranking_text = ""
-                    for rank, (school, count) in enumerate(top10_results, start=1):
-                        ranking_text += f"{rank}위 {school} - {count}명\n"
+                    ranking_text = "".join([f"{rank}위 {school} - {count}명\n" for rank, (school, count) in
+                                            enumerate(top10_results, start=1)])
 
                     title = f"2026년 {company_decoration} 재직자 출신 대학 순위 TOP10 한눈에 정리"
 
@@ -174,9 +142,6 @@ def index():
                     all_tags_str = " ".join(generated_tags)
                     tags = f"#대학순위 {all_tags_str}"
 
-        # ---------------------------------------------------------
-        # 2. Adiga 모드
-        # ---------------------------------------------------------
         elif mode == "adiga":
             university = request.form.get("university", "")
             adiga_year = request.form.get("adiga_year", "")
@@ -194,11 +159,9 @@ def index():
                 )
 
                 if results:
-                    ranking_text = ""
-                    for rank, (dept, rate) in enumerate(results[:10], start=1):
-                        ranking_text += f"{rank}위 {dept} - {rate}\n"
-
-                    top4_str = ", ".join(dept for dept, rate in results[:4])
+                    ranking_text = "".join(
+                        [f"{rank}위 {dept} - {rate}\n" for rank, (dept, rate) in enumerate(results[:10], start=1)])
+                    top4_str = ", ".join(dept for dept, _ in results[:4])
 
                     title = f"{adiga_year}년 {university} {admission_type} 경쟁률 순위 TOP10 한눈에 정리"
                     content = (
@@ -221,6 +184,47 @@ def index():
 
                     tags_list = ["#대학순위", f"#{university.replace(' ', '')}", f"#{admission_type}", "#경쟁률"]
                     tags = " ".join(tags_list)
+
+        elif mode == "adiga_dept":
+
+            department = request.form.get("department", "")
+
+            adiga_year = request.form.get("adiga_dept_year", "")
+
+            admission_type = request.form.get("admission_type_dept", "")
+
+            if department and adiga_year:
+
+                results = search_department(department, adiga_year, admission_type)
+
+                if results:
+                    ranking_text = "".join(
+
+                        [f"{rank}위 {univ} - {rate}\n" for rank, (univ, rate) in enumerate(results[:10], start=1)])
+
+                    top4_str = ", ".join(univ for univ, _ in results[:4])
+
+                    title = f"{adiga_year}년 {department} {admission_type} 경쟁률 대학 순위 TOP10 한눈에 정리"
+
+                    content = (
+                        f"안녕하세요.\n\n"
+                        f"오늘은 {adiga_year}년 {department} {admission_type} 경쟁률 대학 순위 TOP10을 정리해보겠습니다.\n\n"
+                        f"{department} 전공의 경쟁률이 가장 높은 대학은 어디였을까요?\n\n"
+                        f"이번 자료에서는 {department}의 입시 데이터를 바탕으로 경쟁률이 높은 대학을 순위별로 정리했습니다. {department} 진학을 준비하고 있는 수험생이나 고등학생, 해당 전공에 관심이 있는 분들이라면 참고해볼 만한 자료입니다.\n\n"
+                        f"{adiga_year}년 {department} {admission_type} 경쟁률 대학 순위 TOP10을 살펴보겠습니다.\n\n"
+                        f"이번 조사에서 확인된 {department} {admission_type} 경쟁률 TOP10은 다음과 같습니다.\n\n"
+                        f"{ranking_text}\n"
+                        f"상위권에는 {top4_str} 등이 이름을 올렸으며 그 외에도 다양한 대학들이 확인되었습니다.\n\n"
+                        f"이처럼 {department} {admission_type} 경쟁률 대학 순위를 살펴보면 해당 전공을 운영하는 대학 중 어떤 대학의 경쟁률이 상대적으로 높은지 한눈에 확인할 수 있습니다.\n\n"
+                        f"단순히 대학 순위만 살펴보는 것뿐만 아니라, 어떤 대학의 {department} 경쟁률이 높은지, 주요 대학의 해당 전공 입시 경쟁률은 어떤지를 살펴볼 수 있다는 점에서도 흥미로운 자료입니다.\n\n"
+                        f"특히 {department} 진학을 준비하고 있는 수험생이나 고등학생이라면 대학 및 학과 선택과 관련된 참고 자료로 활용해볼 수 있습니다.\n\n"
+                        f"다만 경쟁률이 높다고 해서 반드시 해당 대학의 입학이 어렵거나 특정 대학의 교육 수준이나 선호도가 절대적으로 높다는 것을 의미하는 것은 아닙니다. 실제 대학 입시에서는 모집 인원, 지원자 수, 전형 유형, 모집 단위, 전년도 입시 결과 등 다양한 요소에 따라 경쟁률이 달라질 수 있습니다.\n\n"
+                        f"또한 이번 자료는 대입정보포털에서 확인된 데이터를 바탕으로 정리한 자료이므로 대학 전체의 경쟁률이나 실제 입시 난이도와는 차이가 있을 수 있습니다. 따라서 특정 대학의 경쟁률을 절대적인 대학 순위나 입학 난이도의 기준으로 보기보다는 해당 연도 {department} 입시 상황을 파악하기 위한 참고용 자료로 봐주시기 바랍니다.\n\n"
+                        f"앞으로도 다양한 전공의 전형별 경쟁률, 대학별 입시 경쟁률, 모집단위별 경쟁률 및 주요 대학 입시 관련 자료를 정리해서 소개해드리겠습니다.\n\n"
+                        f"대학 입시에 관심이 있거나 {department} 대학별 경쟁률, 학과별 경쟁률, 수시 경쟁률, 정시 경쟁률 등의 정보를 찾고 있다면 다른 전공의 경쟁률 자료도 함께 확인해보세요.\n\n"
+                    )
+
+                    tags = f"#대학순위 #{department.replace(' ', '')} #{admission_type} #경쟁률"
 
     return render_template(
         "index.html",
