@@ -112,12 +112,10 @@ def search_university(university, adiga_year, admission_type, univ_color, colors
 
             if current_page >= last_page: break
 
-            # 페이지네이션 로직 복원 (11페이지 이상도 넘어가도록 처리)
             next_page = current_page + 1
             old_first_row = get_first_row_text(driver)
 
             try:
-                # 같은 페이지 그룹 내 이동
                 next_page_link = driver.find_element(By.XPATH,
                                                      f"//ul[contains(@class, 'majorPagination')]//li[contains(@class, 'numb')]//a[normalize-space(text())='{next_page}']")
                 driver.execute_script("arguments[0].click();", next_page_link)
@@ -125,7 +123,6 @@ def search_university(university, adiga_year, admission_type, univ_color, colors
                 current_page += 1
             except Exception:
                 try:
-                    # 다음 페이지 그룹(예: 1~10 -> 11~20) 이동 버튼 클릭
                     next_group_button = driver.find_element(By.CSS_SELECTOR, "ul.majorPagination li.nxt a")
                     driver.execute_script("arguments[0].click();", next_group_button)
                     time.sleep(1.5)
@@ -140,22 +137,18 @@ def search_university(university, adiga_year, admission_type, univ_color, colors
     finally:
         driver.quit()
 
-    # 중복 제거 및 최고 경쟁률 유지 로직
     unique_results = {}
     for item in results_data:
         dept = item["department"]
         rate_str = item["rate"]
         rate_float = convert_rate(rate_str)
 
-        # 학과가 처음 등장하거나, 기존에 저장된 경쟁률보다 현재 경쟁률이 더 높은 경우에만 갱신
         if dept not in unique_results or convert_rate(unique_results[dept]) < rate_float:
             unique_results[dept] = rate_str
 
-    # 실수(float) 값 기준으로 내림차순 정렬
     sorted_items = sorted(unique_results.items(), key=lambda x: convert_rate(x[1]), reverse=True)
     top_10_results = [[dept, rate] for dept, rate in sorted_items[:10]]
 
-    # Google Apps Script로 전송
     data = {
         "university": university,
         "adiga_year": adiga_year,
@@ -167,7 +160,6 @@ def search_university(university, adiga_year, admission_type, univ_color, colors
         "univLogo": univ_logo_b64
     }
 
-    # TODO: 본인의 Google Apps Script 배포 URL로 변경하세요.
     WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwTLtGBjOFV0JVy-p6_wgAmfQQP5NHJKOMCOC-xtN4ofMuWQir6jgvlREqFmlCa_Sto/exec"
     try:
         requests.post(WEBHOOK_URL, json=data)

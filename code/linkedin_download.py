@@ -22,7 +22,8 @@ UNIVERSITIES = [
 ]
 
 
-def search_company(company, company_decoration, linkedin_year, company_color, colors, footer_color, company_logo_b64=None):
+def search_company(company, company_decoration, linkedin_year, company_color, colors, footer_color,
+                   company_logo_b64=None):
     results = {}
 
     profile_path = Path("/Users/handokyung/Desktop/DOK/DOK-univ_news_official/linkedin_profile")
@@ -75,18 +76,22 @@ Object.defineProperty(navigator, 'webdriver', {
             time.sleep(2)
 
             try:
-
-                items = wait.until(
-                    EC.presence_of_all_elements_located(
+                container = wait.until(
+                    EC.presence_of_element_located(
                         (
                             By.CSS_SELECTOR,
-                            "div.org-people-bar-graph-element__percentage-bar-info"
+                            'li.artdeco-carousel__item[data-item-index="1"]'
                         )
                     )
                 )
 
+                items = container.find_elements(
+                    By.CSS_SELECTOR,
+                    "div.org-people-bar-graph-element__percentage-bar-info"
+                )
+
                 count = int(
-                    items[5]
+                    items[0]
                     .find_element(By.TAG_NAME, "strong")
                     .text.replace(",", "")
                 )
@@ -94,7 +99,6 @@ Object.defineProperty(navigator, 'webdriver', {
                 results[school] = count
 
             except (TimeoutException, IndexError):
-
                 results[school] = 0
 
             try:
