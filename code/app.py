@@ -1,9 +1,9 @@
 # app.py
 import base64
 from flask import Flask, render_template, request
-from linkedin_download import search_company
-from adiga_download import search_university
-from adiga_dept_download import search_department
+from linkedin_university_graduate_download import search_company
+from adiga_department_competitionrate_download import search_university
+from adiga_university_competitionrate_download import search_department
 
 app = Flask(__name__)
 
