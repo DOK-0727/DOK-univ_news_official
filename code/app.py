@@ -211,7 +211,7 @@ def index():
                         f"오늘은 {adiga_year}년 {department} {admission_type} 경쟁률 대학 순위 TOP10을 정리해보겠습니다.\n\n"
                         f"{department} 전공의 경쟁률이 가장 높은 대학은 어디였을까요?\n\n"
                         f"이번 자료에서는 {department}의 입시 데이터를 바탕으로 경쟁률이 높은 대학을 순위별로 정리했습니다. {department} 진학을 준비하고 있는 수험생이나 고등학생, 해당 전공에 관심이 있는 분들이라면 참고해볼 만한 자료입니다.\n\n"
-                        f"{adiga_year}년 {department} {admission_type} 경쟁률 대학 순위 TOP10을 살펴보겠습니다.\n\n"
+                        f"{adiga_year}년 {department} {admission_type} 경쟁률 대학 순위 TOP10을 살펴보겠습니다.\n\n\n\n"
                         f"이번 조사에서 확인된 {department} {admission_type} 경쟁률 TOP10은 다음과 같습니다.\n\n"
                         f"{ranking_text}\n"
                         f"상위권에는 {top4_str} 등이 이름을 올렸으며 그 외에도 다양한 대학들이 확인되었습니다.\n\n"
